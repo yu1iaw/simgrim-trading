@@ -1,22 +1,29 @@
-import { Ionicons } from '@expo/vector-icons';
-import { View, Text, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import tw from 'twrnc';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import { useUser } from '@clerk/clerk-expo';
 import Colors from '@/constants/Colors';
 
 
 
 export const CustomHeader = () => {
     const { top } = useSafeAreaInsets();
+    const { user } = useUser();
 
     return (
         <BlurView tint="extraLight" intensity={80} style={tw.style(`bg-white/70`, { paddingVertical: top + 10 })}>
             <View
                 style={tw.style(`bg-transparent h-[60px] flex-row items-center px-3 gap-x-3`)}
             >
-                <TouchableOpacity style={tw`bg-gray-500 w-10 h-10 justify-center items-center rounded-full`}>
-                    <Text style={tw`text-white font-semibold`}>SG</Text>
+                <TouchableOpacity onPress={() => router.push('/(auth)/(modals)/profile')} style={tw`bg-gray-500 w-10 h-10 justify-center items-center rounded-full overflow-hidden`}>
+                    {user ? (
+                        <Image source={{ uri: user.imageUrl }} style={tw`w-full h-full`} />
+                    ) : (
+                        <Text style={tw`text-white font-semibold`}>AC</Text>
+                    )}
                 </TouchableOpacity>
                 <View style={tw`flex-1`}>
                     <TextInput

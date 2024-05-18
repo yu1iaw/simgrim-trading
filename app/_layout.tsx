@@ -59,9 +59,9 @@ function InitialLayout() {
 
     if (!inAuthGroup && isSignedIn) {
       router.replace('/(auth)/(tabs)/home');
-    } else if (!isSignedIn) {
+    } else if (!isSignedIn) {      
       router.replace('/');
-    }
+    } 
   }, [isSignedIn])
 
 
@@ -160,6 +160,20 @@ function InitialLayout() {
         }}
       />
       <Stack.Screen name="(auth)/(modals)/lock" options={{ headerShown: false, animation: "none" }} />
+      <Stack.Screen
+        name="(auth)/(modals)/profile"
+        options={{
+          title: "",
+          headerTransparent: true,
+          presentation: "transparentModal",
+          animation: "fade",
+          headerLeft: () => (
+            <TouchableOpacity onPress={router.back} style={tw`p-2 mt-3 bg-white/50 rounded-full`}>
+              <Ionicons name="close-outline" size={32} color={Colors.dark} />
+            </TouchableOpacity>
+          )
+        }}
+      />
       <Stack.Screen
         name='verify/[phone]'
         options={{

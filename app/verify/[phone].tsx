@@ -14,7 +14,7 @@ export default function Verify() {
     const { phone, signin } = useLocalSearchParams();
     const { signIn } = useSignIn();
     const { signUp, setActive } = useSignUp();
-    
+
     const ref = useBlurOnFulfill({ value: code, cellCount: CELL_COUNT });
     const [props, getCellOnLayoutHandler] = useClearByFocusCell({
         value: code,
@@ -64,7 +64,7 @@ export default function Verify() {
         }
     }
 
-    
+
     return (
         <View style={defaultStyles.container}>
             <Text style={defaultStyles.header}>6-digit code</Text>
@@ -78,7 +78,7 @@ export default function Verify() {
                 value={code}
                 onChangeText={setCode}
                 cellCount={CELL_COUNT}
-                rootStyle={tw`my-11`}
+                rootStyle={tw`top-26`}
                 keyboardType="number-pad"
                 textContentType="oneTimeCode"
                 autoComplete={Platform.select({ android: 'sms-otp', default: 'one-time-code' })}
@@ -96,11 +96,6 @@ export default function Verify() {
                     </Fragment>
                 )}
             />
-            <Link href='/login' asChild>
-                <TouchableOpacity>
-                    <Text style={defaultStyles.textLink}>Already have an account? Log in</Text>
-                </TouchableOpacity>
-            </Link>
         </View>
     )
 }

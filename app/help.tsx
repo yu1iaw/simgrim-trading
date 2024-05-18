@@ -1,11 +1,12 @@
-import { useAuth } from "@clerk/clerk-expo";
-import { router } from "expo-router";
-import { Button } from "react-native";
+import { Button, View } from "react-native";
+import tw from "twrnc";
+
+
 
 export default function Help() {
-    const { isSignedIn, sessionId } = useAuth();
-    console.log('signed in: ', isSignedIn);
     return (
-        <Button title="Click" onPress={() => router.push('/(tabs)/settings')} />
+        <View style={tw`p-5`}>
+            <Button title="Help to yourself" />
+        </View>
     )
 }

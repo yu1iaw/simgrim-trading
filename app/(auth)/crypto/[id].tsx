@@ -1,15 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { ActivityIndicator, Image, ScrollView, SectionList, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, ScrollView, SectionList, Text, TouchableOpacity, View } from "react-native";
 import { useHeaderHeight } from '@react-navigation/elements';
 import tw from 'twrnc';
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import { CartesianChart, Line, useChartPressState } from "victory-native";
-import { Circle, useFont } from "@shopify/react-native-skia";
-import { format } from 'date-fns';
-import * as Haptics from 'expo-haptics';
-import Animated, { SharedValue, useAnimatedProps } from "react-native-reanimated";
+import Chart from "@/components/CartesianChart";
 import { defaultStyles } from "@/constants/Styles";
 import Colors from "@/constants/Colors";
 
@@ -20,15 +16,6 @@ export default function Cryptocurrency() {
     const [activeCategory, setActiveCategory] = useState(0);
     const { id } = useLocalSearchParams();
     const headerHeight = useHeaderHeight();
-    const { state, isActive } = useChartPressState({ x: 0, y: { price: 0 } });
-    const font = useFont(require('@/assets/fonts/SpaceMono-Regular.ttf'), 11);
-
-
-    useEffect(() => {
-        if (isActive) Haptics.selectionAsync();
-
-    }, [isActive])
-
 
     const { data, isPending } = useQuery({
         queryKey: ["info", id],
@@ -42,27 +29,6 @@ export default function Cryptocurrency() {
             }),
         enabled: !!id
     });
-
-    const { data: tickers } = useQuery({
-        queryKey: ["tickers"],
-        queryFn: (): Promise<any[]> => fetch('/api/tickers').then(res => res.json())
-    })
-
-    const animatedText = useAnimatedProps(() => {
-        return {
-            text: `${state.y.price.value.value}€`,
-            defaultValue: '',
-        };
-    });
-
-    const animatedDateText = useAnimatedProps(() => {
-        const date = new Date(state.x.value.value);
-        return {
-            text: `${date.toLocaleDateString()}`,
-            defaultValue: '',
-        };
-    });
-
 
     if (isPending) {
         return (
@@ -126,53 +92,8 @@ export default function Cryptocurrency() {
                 )}
                 renderItem={({ item }) => (
                     <>
-                        {tickers && (
-                            <View style={tw.style(`h-[500px] mt-4`, defaultStyles.block)}>
-                                {!isActive ? (
-                                    <View>
-                                        <Text style={tw`font-bold text-sm tracking-wide`}>{tickers.at(-1).price}€</Text>
-                                        <Text style={tw`text-xs`}>Today</Text>
-                                    </View>
-                                ) : (
-                                    <View>
-                                        <AnimatedTextInput
-                                            editable={false}
-                                            underlineColorAndroid="transparent"
-                                            style={tw`font-bold text-sm tracking-wide`}
-                                            animatedProps={animatedText}
-                                        />
-                                        <AnimatedTextInput
-                                            editable={false}
-                                            underlineColorAndroid="transparent"
-                                            style={tw`text-xs`}
-                                            animatedProps={animatedDateText}
-                                        />
-                                    </View>
-                                )}
-                                <CartesianChart
-                                    chartPressState={state}
-                                    data={tickers}
-                                    xKey="timestamp"
-                                    yKeys={["price"]}
-                                    axisOptions={{
-                                        font,
-                                        tickCount: 5,
-                                        labelOffset: { x: -2, y: 4 },
-                                        labelColor: Colors.gray,
-                                        formatYLabel: (v) => `€${v}`,
-                                        formatXLabel: (ms) => format(new Date(ms), 'dd/M')
-                                    }}
-                                >
-                                    {({ points }) => (
-                                        <>
-                                            <Line points={points.price} color={Colors.primary} strokeWidth={3} />
-                                            {isActive && <ToolTip x={state.x.position} y={state.y.price.position} />}
-                                        </>
-                                    )}
-                                </CartesianChart>
-                            </View>
-                        )}
-                        <View style={tw.style(`mt-5`, defaultStyles.block)}>
+                        <Chart />
+                        <View style={tw.style(`my-5`, defaultStyles.block)}>
                             <Text style={tw`text-base font-bold`}>Overview</Text>
                             <Text style={tw`text-gray-700`}>{item.description}</Text>
                             <Text>{JSON.stringify(item, null, 4)}</Text>
@@ -180,13 +101,7 @@ export default function Cryptocurrency() {
                     </>
                 )}
             />
-
         </>
     )
 }
 
-function ToolTip({ x, y }: { x: SharedValue<number>; y: SharedValue<number> }) {
-    return <Circle cx={x} cy={y} r={8} color={Colors.primary} />;
-}
-
-const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
