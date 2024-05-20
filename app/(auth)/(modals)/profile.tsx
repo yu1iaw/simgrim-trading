@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, Text, TextInput, TouchableOpacity, View } from "react-native";
 import tw from 'twrnc';
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { BlurView } from "expo-blur";
@@ -70,7 +70,15 @@ export default function Profile() {
     }
 
 
-    if (!user) return <BlurView tint="dark" intensity={100} style={tw`flex-1 bg-gray-800/90`} />
+    if (!user) {
+        return (
+            <BlurView tint="dark" intensity={100} style={tw`flex-1 bg-gray-800/90 justify-center items-center pt-10`}>
+                <View style={tw`p-2 bg-white/70 rounded-full`}>
+                    <ActivityIndicator size="large" />
+                </View>
+            </BlurView>
+        )
+    } 
         
     return (
         <BlurView tint="dark" intensity={100} style={tw.style(`flex-1 bg-gray-800/90`, { paddingTop: headerHeight + 20 })}>
@@ -99,7 +107,7 @@ export default function Profile() {
                         </>
                     ) : (
                         <>
-                            <Text style={tw`text-white text-xl tracking-wide font-semibold`}>{user?.firstName} {user?.lastName}</Text>
+                            <Text style={tw`text-white text-xl tracking-wide font-semibold`}>{user?.firstName ?? 'Anonymous'} {user?.lastName}</Text>
                             <TouchableOpacity onPress={() => setEdit(!edit)} style={tw`p-2 -ml-3 rounded-full`}>
                                 <Ionicons name="ellipsis-vertical" size={23} color="white" />     
                             </TouchableOpacity>

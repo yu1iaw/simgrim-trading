@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { Link, router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { isClerkAPIResponseError, useAuth, useSignIn, useSignUp } from "@clerk/clerk-expo";
 import tw from 'twrnc';
 import { CodeField, Cursor, useBlurOnFulfill, useClearByFocusCell } from 'react-native-confirmation-code-field';

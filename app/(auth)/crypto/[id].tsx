@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { ActivityIndicator, Image, ScrollView, SectionList, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, SectionList, Text, TouchableOpacity, View } from "react-native";
 import { useHeaderHeight } from '@react-navigation/elements';
 import tw from 'twrnc';
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
+import { AnchorProvider, ScrollTo, ScrollView, Target, useAnchors, useRegisterScroller } from "@nandorojo/anchor";
 import Chart from "@/components/CartesianChart";
 import { defaultStyles } from "@/constants/Styles";
 import Colors from "@/constants/Colors";
@@ -16,6 +17,8 @@ export default function Cryptocurrency() {
     const [activeCategory, setActiveCategory] = useState(0);
     const { id } = useLocalSearchParams();
     const headerHeight = useHeaderHeight();
+    const anchors = useAnchors();
+
 
     const { data, isPending } = useQuery({
         queryKey: ["info", id],
@@ -30,6 +33,14 @@ export default function Cryptocurrency() {
         enabled: !!id
     });
 
+    const onCategoryPress = (index: number, category: string) => {
+        setActiveCategory(index);
+        anchors.current?.scrollTo(category, {
+            animated: true,
+            offset: -50
+        });
+    }
+
     if (isPending) {
         return (
             <View style={tw`flex-1 justify-center items-center`}>
@@ -39,13 +50,14 @@ export default function Cryptocurrency() {
     };
 
     return (
-        <>
+        <ScrollView anchors={anchors}>
             <Stack.Screen
                 options={{
                     title: data?.title,
                 }}
             />
             <SectionList
+                scrollEnabled={false}
                 contentInsetAdjustmentBehavior="automatic"
                 style={{ marginTop: headerHeight }}
                 keyExtractor={item => item.id}
@@ -58,13 +70,13 @@ export default function Cryptocurrency() {
                         showsHorizontalScrollIndicator={false}
                     >
                         {categories.map((category, index) => (
-                            <TouchableOpacity
-                                onPress={() => setActiveCategory(index)}
+                            <ScrollTo target=""
+                                onPress={() => onCategoryPress(index, category)} 
                                 key={category}
                                 style={tw`min-w-22 h-9 px-2 justify-center items-center rounded-full ${activeCategory === index ? 'bg-white shadow-sm' : ''}`}
                             >
                                 <Text style={tw`${activeCategory === index ? 'text-black font-medium' : 'text-gray-700'}`}>{category}</Text>
-                            </TouchableOpacity>
+                            </ScrollTo>
                         ))}
                     </ScrollView>
                 )}
@@ -93,15 +105,22 @@ export default function Cryptocurrency() {
                 renderItem={({ item }) => (
                     <>
                         <Chart />
-                        <View style={tw.style(`my-5`, defaultStyles.block)}>
-                            <Text style={tw`text-base font-bold`}>Overview</Text>
-                            <Text style={tw`text-gray-700`}>{item.description}</Text>
-                            <Text>{JSON.stringify(item, null, 4)}</Text>
-                        </View>
+                        <Target name="Overview">
+                            <View style={tw.style(`my-5`, defaultStyles.block)}>
+                                <Text style={tw`text-base font-bold`}>Overview</Text>
+                                <Text style={tw`text-gray-700`}>{item.description}</Text>
+                            </View>
+                        </Target>
+                        <Target name="News">
+                            <View style={tw.style(`my-5`, defaultStyles.block)}>
+                                <Text style={tw`text-base font-bold`}>News</Text>
+                                <Text>{JSON.stringify(item, null, 4)}</Text>
+                            </View>
+                        </Target>
                     </>
                 )}
             />
-        </>
+        </ScrollView>
     )
 }
 
